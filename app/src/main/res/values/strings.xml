@@ -5,7 +5,7 @@
     <string name="startListening">Start Listening</string>
     <string name="stopListening">Stop Listening</string>
     <string name="set_home">Set Home Location</string>
-    <string name="unknown">unknown</string>
+    <string name="unknown">0</string>
     <string name="steps_taken">Steps taken</string>
     <string name="device_velocity">Device velocity</string>
     <string name="distance_from_home">Distance from home</string>

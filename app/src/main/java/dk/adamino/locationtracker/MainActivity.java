@@ -166,12 +166,12 @@ public class MainActivity extends AppCompatActivity implements ILocationCallBack
 
     @Override
     public void setVelocity(double speed) {
-        String speedAsText = mDecimalFormat.format(speed) + "m/s";
+        String speedAsText = mDecimalFormat.format(speed) + " m/s";
         txtDeviceVelocityValue.setText(speedAsText);
     }
 
     public void setDistanceFromHome(Location location) {
-        String distanceToHomeAsText = mDecimalFormat.format(location.distanceTo(mHomeLocation)) + "m";
+        String distanceToHomeAsText = mDecimalFormat.format(location.distanceTo(mHomeLocation)) + " m";
         txtDistanceFromHome.setText(distanceToHomeAsText);
     }
 
