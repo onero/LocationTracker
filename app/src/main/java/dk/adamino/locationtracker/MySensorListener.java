@@ -10,11 +10,11 @@ import android.hardware.SensorEventListener;
 
 public class MySensorListener implements SensorEventListener {
 
-    ISensorCallbacks m_view;
+    ISensorCallBack m_view;
     private boolean mjustStartedCounting;
     private float mStartSteps;
 
-    public MySensorListener(ISensorCallbacks view) {
+    public MySensorListener(ISensorCallBack view) {
         m_view = view;
         mjustStartedCounting = true;
     }

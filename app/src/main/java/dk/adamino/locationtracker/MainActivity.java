@@ -1,6 +1,7 @@
 package dk.adamino.locationtracker;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -28,7 +29,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements ILocationCallBack, ISensorCallbacks {
+public class MainActivity extends AppCompatActivity implements ILocationCallBack, ISensorCallBack {
 
     public static final int MY_PERMISSIONS_REQUEST_ACCESS_CODE = 1;
 
@@ -49,13 +50,18 @@ public class MainActivity extends AppCompatActivity implements ILocationCallBack
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        txtHomeLocation = findViewById(R.id.currentLoc);
-        btnListening = findViewById(R.id.startListening);
-        txtDistanceFromHome = findViewById(R.id.txtDistanceFromHome);
-        txtDeviceVelocityValue = findViewById(R.id.txtDeviceVelocityValue);
-        txtStepsFromHome = findViewById(R.id.txtStepsFromHomeValue);
-        btnHomeLocation = findViewById(R.id.set_home);
+        setupViews();
 
+        setupButtons();
+
+        mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+
+        mLocationListener = null;
+    }
+
+    private void setupButtons() {
         btnListening.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -72,12 +78,15 @@ public class MainActivity extends AppCompatActivity implements ILocationCallBack
                 MainActivity.this.setHomeLocation();
             }
         });
+    }
 
-        mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-
-        mLocationListener = null;
+    private void setupViews() {
+        txtHomeLocation = findViewById(R.id.currentLoc);
+        btnListening = findViewById(R.id.startListening);
+        txtDistanceFromHome = findViewById(R.id.txtDistanceFromHome);
+        txtDeviceVelocityValue = findViewById(R.id.txtDeviceVelocityValue);
+        txtStepsFromHome = findViewById(R.id.txtStepsFromHomeValue);
+        btnHomeLocation = findViewById(R.id.set_home);
     }
 
     private void registerStepCounterSensor() {
@@ -87,10 +96,6 @@ public class MainActivity extends AppCompatActivity implements ILocationCallBack
         } else {
             Toast.makeText(this, "Couldn't register sensor!", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    private void unregisterStepCounterSensor() {
-        mSensorManager.unregisterListener(mSensorEventListener);
     }
 
     @Override
@@ -110,38 +115,37 @@ public class MainActivity extends AppCompatActivity implements ILocationCallBack
         }
         double latitude = mHomeLocation.getLatitude();
         double longitude = mHomeLocation.getLongitude();
-        String msg = "Latitude: " + latitude + "\n" +
-                     "Longitude: "+ longitude;
+        String msg = "Latitude: " + mDecimalFormat.format(latitude) + "\n" +
+                     "Longitude: "+ mDecimalFormat.format(longitude);
 
         txtHomeLocation.setText(msg);
 
     }
 
+    @SuppressLint("MissingPermission")
     private Location getHomeLocation() {
+        checkPermissions("NEED PERMISSION TO KNOW HOME!");
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            Log.e("GPS", "NEED PERMISSION TO KNOW LASTKNOWN!");
-
-            checkPermissions();
-        }
-        Location location = mLocationManager
-                .getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-        return location;
+        return mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
     }
 
+    private void checkPermissions(String msg) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.e("GPS", msg);
+            getPermissions();
+        }
+    }
+
+    @SuppressLint("MissingPermission")
     protected void startListening() {
+
+        checkPermissions("NEED PERMISSION TO LISTEN!");
 
         mLocationListener = new MyLocationListener(this);
         mSensorEventListener = new MySensorListener(this);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.e("GPS", "NEED PERMISSION TO LISTEN!");
-            checkPermissions();
-        }
         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                 1000, // the minimal time (ms) between notifications
                 0, // the minimal distance (meter) between notifications
@@ -154,7 +158,8 @@ public class MainActivity extends AppCompatActivity implements ILocationCallBack
     private void stopListening() {
         if (mLocationListener == null) return;
         mLocationManager.removeUpdates(mLocationListener);
-        unregisterStepCounterSensor();
+        if (mSensorEventListener == null) return;
+        mSensorManager.unregisterListener(mSensorEventListener);
     }
 
     // ILocationCallBack
@@ -170,6 +175,15 @@ public class MainActivity extends AppCompatActivity implements ILocationCallBack
         txtDistanceFromHome.setText(distanceToHomeAsText);
     }
 
+    // ISensorCallBack
+
+    @Override
+    public void setSteps(int steps) {
+        txtStepsFromHome.setText(steps + "");
+    }
+
+    // Permission Requests
+
     /**
      * Verify that user allowed usage of camera
      *
@@ -183,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements ILocationCallBack
             case MY_PERMISSIONS_REQUEST_ACCESS_CODE: {
                 if (!(grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    checkPermissions();
+                    getPermissions();
                 }
             }
         }
@@ -193,7 +207,7 @@ public class MainActivity extends AppCompatActivity implements ILocationCallBack
      * checking  permissions at Runtime.
      */
     @TargetApi(Build.VERSION_CODES.M)
-    private void checkPermissions() {
+    private void getPermissions() {
         final String[] requiredPermissions = {
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -209,10 +223,5 @@ public class MainActivity extends AppCompatActivity implements ILocationCallBack
             requestPermissions(neededPermissions.toArray(new String[]{}),
                     MY_PERMISSIONS_REQUEST_ACCESS_CODE);
         }
-    }
-
-    @Override
-    public void setSteps(int steps) {
-        txtStepsFromHome.setText(steps + "");
     }
 }

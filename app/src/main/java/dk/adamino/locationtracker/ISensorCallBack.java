@@ -4,7 +4,7 @@ package dk.adamino.locationtracker;
  * Created by Adamino.
  */
 
-public interface ISensorCallbacks {
+public interface ISensorCallBack {
 
     /**
      * Set amount of steps taken
