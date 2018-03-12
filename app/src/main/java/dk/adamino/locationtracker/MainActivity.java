@@ -4,6 +4,9 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -25,22 +28,21 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements IViewCallBack {
+public class MainActivity extends AppCompatActivity implements ILocationCallBack, ISensorCallbacks {
 
     public static final int MY_PERMISSIONS_REQUEST_ACCESS_CODE = 1;
-    public static final double STEP_DISTANE_MAN = 0.78;
 
     ToggleButton btnListening;
     Button btnHomeLocation;
 
     TextView txtHomeLocation, txtDistanceFromHome, txtDeviceVelocityValue, txtStepsFromHome;
 
-    private LocationListener locListener;
+    private LocationListener mLocationListener;
+    private SensorEventListener mSensorEventListener;
     private Location mHomeLocation;
     private NumberFormat mDecimalFormat = new DecimalFormat("#.##");
     private LocationManager mLocationManager;
-
-    private double mSteps;
+    private SensorManager mSensorManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,15 +50,13 @@ public class MainActivity extends AppCompatActivity implements IViewCallBack {
         setContentView(R.layout.activity_main);
 
         txtHomeLocation = findViewById(R.id.currentLoc);
-
         btnListening = findViewById(R.id.startListening);
-
         txtDistanceFromHome = findViewById(R.id.txtDistanceFromHome);
         txtDeviceVelocityValue = findViewById(R.id.txtDeviceVelocityValue);
         txtStepsFromHome = findViewById(R.id.txtStepsFromHomeValue);
+        btnHomeLocation = findViewById(R.id.set_home);
 
         btnListening.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 if (btnListening.isChecked())
@@ -65,9 +65,6 @@ public class MainActivity extends AppCompatActivity implements IViewCallBack {
                     MainActivity.this.stopListening();
             }
         });
-
-        btnHomeLocation = findViewById(R.id.whereami);
-
         btnHomeLocation.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -76,12 +73,24 @@ public class MainActivity extends AppCompatActivity implements IViewCallBack {
             }
         });
 
-        mLocationManager =
-                (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        locListener = null;
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
-        mSteps = 0;
+        mLocationListener = null;
+    }
+
+    private void registerStepCounterSensor() {
+        Sensor countSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+        if (countSensor != null) {
+            mSensorManager.registerListener(mSensorEventListener, countSensor, SensorManager.SENSOR_DELAY_UI);
+        } else {
+            Toast.makeText(this, "Couldn't register sensor!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void unregisterStepCounterSensor() {
+        mSensorManager.unregisterListener(mSensorEventListener);
     }
 
     @Override
@@ -125,25 +134,30 @@ public class MainActivity extends AppCompatActivity implements IViewCallBack {
 
     protected void startListening() {
 
-        locListener = new MyLocationListener(this);
+        mLocationListener = new MyLocationListener(this);
+        mSensorEventListener = new MySensorListener(this);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.e("GPS", "NEED PERMISSION TO LISTEN!");
             checkPermissions();
         }
         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                 1000, // the minimal time (ms) between notifications
                 0, // the minimal distance (meter) between notifications
-                locListener);
+                mLocationListener);
+
+
+        registerStepCounterSensor();
     }
 
     private void stopListening() {
-        if (locListener == null) return;
-        mLocationManager.removeUpdates(locListener);
+        if (mLocationListener == null) return;
+        mLocationManager.removeUpdates(mLocationListener);
+        unregisterStepCounterSensor();
     }
 
-    // IViewCallBack
+    // ILocationCallBack
 
     @Override
     public void setVelocity(double speed) {
@@ -195,5 +209,10 @@ public class MainActivity extends AppCompatActivity implements IViewCallBack {
             requestPermissions(neededPermissions.toArray(new String[]{}),
                     MY_PERMISSIONS_REQUEST_ACCESS_CODE);
         }
+    }
+
+    @Override
+    public void setSteps(int steps) {
+        txtStepsFromHome.setText(steps + "");
     }
 }

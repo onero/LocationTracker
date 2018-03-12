@@ -6,7 +6,7 @@ import android.location.Location;
  * Created by Adamino.
  */
 
-public interface IViewCallBack {
+public interface ILocationCallBack {
 
     /**
      * Set the velocity of the device

@@ -6,9 +6,9 @@ import android.os.Bundle;
 
 public class MyLocationListener implements LocationListener {
 
-    IViewCallBack m_view;
+    ILocationCallBack m_view;
 
-    public MyLocationListener(IViewCallBack view)
+    public MyLocationListener(ILocationCallBack view)
     { m_view = view; }
 
     public void onStatusChanged(String provider, int status,

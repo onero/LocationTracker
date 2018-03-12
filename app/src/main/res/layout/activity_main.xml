@@ -1,115 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
                                              xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             xmlns:tools="http://schemas.android.com/tools"
                                              android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
-              android:orientation="vertical" >
+                                             android:layout_height="fill_parent"
+                                             android:orientation="vertical"
+                                             tools:layout_editor_absoluteY="81dp">
 
     <TextView
         android:id="@+id/txtHome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="72dp"
+        android:layout_marginTop="16dp"
         android:text="Home Location:"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        />
 
     <TextView
         android:id="@+id/currentLoc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="76dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="18dp"
         android:text="@string/unknown"
-        app:layout_constraintStart_toEndOf="@+id/txtHome"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtHome"
+        />
 
 
     <Button
-        android:id="@+id/whereami"
+        android:id="@+id/set_home"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:layout_marginStart="16dp"
         android:text="@string/set_home"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        />
 
     <ToggleButton
         android:id="@+id/startListening"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="15dp"
         android:textOff="@string/startListening"
         android:textOn="@string/stopListening"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        />
 
     <TextView
         android:id="@+id/txtDistance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="50dp"
-        android:text="Distance from home:"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/distance_from_home"
         android:textSize="18sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtHome"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
 
     <TextView
         android:id="@+id/txtDistanceFromHome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="36dp"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="18dp"
         android:text="@string/unknown"
-        app:layout_constraintStart_toEndOf="@+id/txtDistance"
-        app:layout_constraintTop_toBottomOf="@+id/currentLoc"/>
+        app:layout_constraintStart_toStartOf="@+id/txtDistance"
+        app:layout_constraintTop_toBottomOf="@+id/txtDistance"
+        />
 
     <TextView
         android:id="@+id/txtVelocity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="50dp"
-        android:text="Device velocity"
+        android:text="@string/device_velocity"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtDistance"/>
+        app:layout_constraintTop_toTopOf="@+id/txtSteps"
+        />
 
     <TextView
         android:id="@+id/txtDeviceVelocityValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="28dp"
-        android:layout_marginTop="56dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
         android:text="@string/unknown"
-        app:layout_constraintStart_toEndOf="@+id/txtVelocity"
-        app:layout_constraintTop_toBottomOf="@+id/txtDistanceFromHome"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtVelocity"
+        />
 
     <TextView
         android:id="@+id/txtSteps"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="50dp"
-        android:text="Steps taken from home"
+        android:layout_marginTop="200dp"
+        android:text="@string/steps_taken"
         android:textSize="18sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtVelocity"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/txtDistanceFromHome"
+        app:layout_constraintTop_toTopOf="parent"
+        />
 
     <TextView
         android:id="@+id/txtStepsFromHomeValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="32dp"
         android:text="@string/unknown"
-        app:layout_constraintStart_toEndOf="@+id/txtSteps"
-        app:layout_constraintTop_toBottomOf="@+id/txtDeviceVelocityValue"/>
+        app:layout_constraintStart_toStartOf="@+id/txtSteps"
+        app:layout_constraintTop_toBottomOf="@+id/txtSteps"
+        />
 
 
 </android.support.constraint.ConstraintLayout>
