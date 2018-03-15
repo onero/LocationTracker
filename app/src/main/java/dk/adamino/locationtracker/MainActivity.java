@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity implements ILocationCallBack
 
     ToggleButton btnListening;
     Button btnHomeLocation;
-
     TextView txtHomeLocation, txtDistanceFromHome, txtDeviceVelocityValue, txtStepsFromHome;
 
     private LocationListener mLocationListener;

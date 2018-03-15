@@ -11,12 +11,12 @@ import android.hardware.SensorEventListener;
 public class MySensorListener implements SensorEventListener {
 
     ISensorCallBack m_view;
-    private boolean mjustStartedCounting;
+    private boolean mJustStartedCounting;
     private float mStartSteps;
 
     public MySensorListener(ISensorCallBack view) {
         m_view = view;
-        mjustStartedCounting = true;
+        mJustStartedCounting = true;
     }
 
     /**
@@ -26,9 +26,9 @@ public class MySensorListener implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent event) {
         float steps = event.values[0];
-        if (mjustStartedCounting) {
+        if (mJustStartedCounting) {
             mStartSteps = steps;
-            mjustStartedCounting = false;
+            mJustStartedCounting = false;
         }
         // Reasoning behind this math can be found here: https://stackoverflow.com/questions/22649324/step-counter-doesnt-reset-the-step-count
         int stepsTakenSinceStart = (int) (steps - mStartSteps);
